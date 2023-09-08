@@ -24,7 +24,17 @@ config :shindagame, ShindagameWeb.Endpoint,
 # configure Guardian
     config :shindagame, Shindagame.Guardian,
     secret_key: "MMfxuuYxNy7ahMz2oGlTritIBElldc+6Fbw++eTZfPo5aqZ6lPpFI8CBgHA+gBqE"
-# Configures the mailer
+# Configure email delivery
+    config :shindagame, Shindagame.Mailer,
+    adapter: Bamboo.SMTPAdapter,
+    server: "smtp.domain",
+    port: 587,
+    username: System.get_env("SMTP_USERNAME"),
+    password: System.get_env("SMTP_PASSWORD"),
+    tls: :always,
+    retries: 3
+
+
 #
 # By default it uses the "Local" adapter which stores the emails
 # locally. You can see the emails in your browser, at "/dev/mailbox".

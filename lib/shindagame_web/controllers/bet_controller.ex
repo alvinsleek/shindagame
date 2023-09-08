@@ -1,46 +1,69 @@
-defmodule ShindagameWeb.BetController do
-  use ShindagameWeb, :controller
+# defmodule ShindagameWeb.BetController do
+#   use ShindagameWeb, :controller
+#   import Ecto.Changeset
 
-  def new(conn, _params) do
-    render(conn, "new.html")
-  end
+#   alias Shindagame.Bet
+#   alias Shindagame.Accounts.User
 
-  def create(conn, %{"bet" => bet_params}) do
-    user = current_user()
-    game = get_game_from_params(bet_params)
+#   def new(conn, _params) do
+#     render(conn, "new.html")
+#   end
 
-    {valid_bet, error_message} = validate_and_check_balance(user, game, bet_params)
+#   def create(conn, %{"bet" => bet_params}) do
+#     user = current_user()
+#     game = get_game_from_params(bet_params)
 
-    if valid_bet do
-      bet = Shindagame.Bets.Bet.changeset(%Bet{}, Map.put(bet_params, "user_id", user.id) |> Map.put("game_id", game.id))
+#     {valid_bet, error_message} = validate_and_check_balance(user, game, bet_params)
 
-      case Repo.insert(bet) do
-        {:ok, _bet} ->
-          Shindagame.Accounts.User.update_balance(user, -bet.amount)
+#     if valid_bet do
+#       bet_changeset = Shindagame.Bets.Bet.changeset(%Shindagame.Bets.Bet{}, Map.put(bet_params, "user_id", user.id) |> Map.put("game_id", game.id))
 
-        {:error, changeset} ->
-      end
+#       case Repo.insert(bet_changeset) do
+#         {:ok, _bet} ->
+#           Shindagame.Accounts.User.update_balance(user, -bet_params["amount"])
 
-    else
-      
-    end
-    # Handle the bet creation logic here, e.g., storing the bet in the database
-    # Redirect to the betting history page or show a success message
-  end
+#           conn
+#           |> put_flash(:info, "Bet cancelled successfully")
+#           |> redirect(to: bet_path(conn, :index))
 
-  def cancel(conn, _params) do
-    render(conn, "cancel.html")
-  end
+#         {:error, changeset} ->
+#           conn
+#           |> put_flash(:error, "Failed to place bet")
+#           |> render("new.html", changeset: changeset)
+#       end
 
-  def cancel_bet(conn, %{"bet_id" => bet_id}) do
-    # Handle the bet cancellation logic here, e.g., updating the bet status in the database
-    # Redirect to the betting history page or show a success message
-  end
+#     else
+#       conn
+#       |> put_flash(:error, "Invalid bet or insufficient balance: #{error_message}")
+#       |> redirect(to: bet_path(conn, :new))
+#     end
+#   end
 
-  def history(conn, _params) do
-    # Retrieve the user's betting history (from your database) and assign it to a variable
-    # betting_history = Shindagame.Bets.Bet.get_user_betting_history(user_id)
+#   def cancel(conn, _params) do
+#     render(conn, "cancel.html")
+#   end
 
-    # render(conn, "history.html", betting_history: betting_history)
-  end
-end
+#   def cancel_bet(conn, %{"bet_id" => bet_id}) do
+#     user = current_user()
+#     bet = get_bet_from_params(bet_id)
+
+#     if can_cancel_bet?(bet) do
+#       Bet.cancel_bet(bet)
+
+#       User.update_balance(user, bet.amount)
+#       conn
+#       |> put_flash(:info, "Bet cancelled successfully")
+#       |> redirect(to: bet_path(conn, :index))
+#     else
+#       conn
+#       |> put_flash(:error, "cancelling bet is not allowed at this time!")
+#       |> redirect(to: bet_path(conn, :index))
+#     end
+#   end
+
+#   def history(conn, _params) do
+#     betting_history = Shindagame.Bets.Bet.get_user_betting_history(user_id)
+
+#     render(conn, "history.html", betting_history: betting_history)
+#   end
+# end
